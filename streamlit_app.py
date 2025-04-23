@@ -3,7 +3,7 @@ import streamlit as st
 import requests
 import pandas as pd
 
-API_BASE = "http://localhost:8000"
+API_BASE = "https://render-scheduler-api.onrender.com"
 
 st.title("📋 Job Shop Scheduler")
 
