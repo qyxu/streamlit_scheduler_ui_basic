@@ -6,3 +6,5 @@ streamlit
 requests
 pandas
 matplotlib
+streamlit-authenticator
+bcrypt
