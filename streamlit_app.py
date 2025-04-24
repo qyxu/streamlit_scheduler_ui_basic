@@ -80,7 +80,7 @@ with col1:
     st.dataframe(pd.DataFrame(st.session_state["schedule_v1"]))
 
     # Add explanatory text clearly under the V1 button
-    st.markdown("### 🚩 Scheduler V1 uses **No-overlap per machine** logic.")
+    st.markdown("### 🚩 Scheduler V1 uses No-overlap per machine logic and optimizes for the shortest end time.")
 
     st.markdown("---")
 
@@ -99,6 +99,11 @@ with col2:
     if st.session_state["v2_status"]:
         st.info(st.session_state["v2_status"])
     st.dataframe(pd.DataFrame(st.session_state["schedule_v2"]))
+
+    # Add explanatory text clearly under the V1 button
+    st.markdown("### 🚩 Scheduler V2 uses No-overlap per machine logic and optimizes for minimum completion time.")
+
+    st.markdown("---")
 
 # Comparison chart if both exist
 if st.session_state["schedule_v1"] and st.session_state["schedule_v2"]:
