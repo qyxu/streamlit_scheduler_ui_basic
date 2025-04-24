@@ -124,9 +124,25 @@ if st.session_state.get("authentication_status"):
                 ax.barh(row["job_id"], row["end"] - row["start"], left=row["start"])
             st.pyplot(fig)
 
-    if st.button("🧹 Clear All Jobs + Schedule"):
-        requests.delete(f"{API_BASE}/reset")
-        st.success("✅ Cleared all job and schedule data.")
+    if st.button("🧹 Clear All Jobs + Schedule", key="clear_btn"):
+        try:
+            r = requests.delete(f"{API_BASE}/reset")
+            if r.status_code == 200:
+                # Reset session state immediately
+                st.session_state["schedule_v1"] = []
+                st.session_state["schedule_v2"] = []
+                st.session_state["v1_status"] = ""
+                st.session_state["v2_status"] = ""
+                
+                st.success("✅ Cleared all job and schedule data.")
+                
+                # Rerun the app to refresh data immediately
+                st.experimental_rerun()
+            else:
+                st.error(f"❌ Reset failed: {r.text}")
+        except Exception as e:
+            st.error(f"❌ API Error: {e}")
+
 
 
 elif st.session_state["authentication_status"] is False:
