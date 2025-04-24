@@ -79,10 +79,10 @@ with col1:
         st.info(st.session_state["v1_status"])
     st.dataframe(pd.DataFrame(st.session_state["schedule_v1"]))
 
-# Add explanatory text clearly under the V1 button
-st.markdown("### 🚩 Scheduler V1 uses **No-overlap per machine** logic.")
+    # Add explanatory text clearly under the V1 button
+    st.markdown("### 🚩 Scheduler V1 uses **No-overlap per machine** logic.")
 
-st.markdown("---")
+    st.markdown("---")
 
 with col2:
     st.subheader("Generate Schedule V2")
