@@ -10,7 +10,7 @@ credentials = {
     'usernames': {
         'scheduler_user': {
             'name': 'Scheduler Admin',
-            'password': '$2b$12$8L7OvR.e2Et8hmnXJ5BSsu9NJh9ixgyWxGCCiVyi8TL2fqwMh0.ce'  # replace with the generated hashed password
+            'password': '$2b$12$8L7OvR.e2Et8hmnXJ5BSsu9NJh9ixgyWxGCCiVyi8TL2fqwMh0.ce'  # Replace with your actual hashed password
         }
     }
 }
@@ -22,11 +22,22 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=30
 )
 
-name, authentication_status, username = authenticator.login('Login', 'main')
+# Updated login method signature:
+authentication_status, username = authenticator.login('Login', location='main')
 
 if authentication_status:
-    authenticator.logout('Logout', 'sidebar')
-    st.sidebar.write(f'Welcome *{name}*')
+    authenticator.logout('Logout', location='sidebar')
+    st.sidebar.write(f'Welcome *{credentials["usernames"][username]["name"]}*')
+    
+    # Your main app content below
+    st.title("📋 Job Scheduler Demo")
+    # ... existing Streamlit UI code ...
+
+elif authentication_status is False:
+    st.error('Username/password incorrect')
+elif authentication_status is None:
+    st.warning('Please enter username/password')
+
 
     # --- Original app code below (unchanged) ---
     API_BASE = "https://render-scheduler-api.onrender.com"
