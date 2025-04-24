@@ -3,13 +3,19 @@ import streamlit as st
 import requests
 import pandas as pd
 import matplotlib.pyplot as plt
+from PIL import Image
 
 API_BASE = "https://render-scheduler-api.onrender.com"  # Replace with your backend URL
 
-st.title("📋 Manufacturing Job Scheduler")
-st.subtitle("** Demo **")
+# Header with logo
+logo = Image.open("logo.png")
+col_logo, col_title = st.columns([1, 5])
+with col_logo:
+    st.image(logo, width=90)
+with col_title:
+    st.title("📋 Unified Job Shop Scheduler")
 
-# Session state initialization
+# Initialize session state
 if "schedule_v1" not in st.session_state:
     st.session_state["schedule_v1"] = []
 if "schedule_v2" not in st.session_state:
@@ -19,7 +25,7 @@ if "v1_status" not in st.session_state:
 if "v2_status" not in st.session_state:
     st.session_state["v2_status"] = ""
 
-# Show current jobs at top
+# Show current jobs at the top
 st.subheader("📊 Current Jobs")
 try:
     jobs = requests.get(f"{API_BASE}/jobs").json()
@@ -56,7 +62,7 @@ if st.sidebar.button("Add Job", key="add_job_btn"):
     except Exception as e:
         st.sidebar.error(f"❌ API Error: {e}")
 
-# Schedule generation and feedback
+# Generate and display schedule V1 and V2
 col1, col2 = st.columns(2)
 
 with col1:
@@ -71,7 +77,6 @@ with col1:
                 st.session_state["v1_status"] = f"❌ V1 failed: {r.text}"
         except Exception as e:
             st.session_state["v1_status"] = f"❌ Error: {e}"
-
     if st.session_state["v1_status"]:
         st.info(st.session_state["v1_status"])
     st.dataframe(pd.DataFrame(st.session_state["schedule_v1"]))
@@ -88,16 +93,14 @@ with col2:
                 st.session_state["v2_status"] = f"❌ V2 failed: {r.text}"
         except Exception as e:
             st.session_state["v2_status"] = f"❌ Error: {e}"
-
     if st.session_state["v2_status"]:
         st.info(st.session_state["v2_status"])
     st.dataframe(pd.DataFrame(st.session_state["schedule_v2"]))
 
-# Side-by-side comparison (if both exist)
+# Gantt + metrics if both exist
 if st.session_state["schedule_v1"] and st.session_state["schedule_v2"]:
     df1 = pd.DataFrame(st.session_state["schedule_v1"])
     df2 = pd.DataFrame(st.session_state["schedule_v2"])
-
     st.subheader("📈 Strategy Gantt Chart Comparison")
 
     col1, col2 = st.columns(2)
@@ -141,7 +144,7 @@ if st.session_state["schedule_v1"] and st.session_state["schedule_v2"]:
     }).reset_index()
     st.dataframe(summary)
 
-# Clear all jobs and schedules
+# Clear all
 if st.button("🧹 Clear All Jobs + Schedule", key="clear_btn"):
     try:
         r = requests.delete(f"{API_BASE}/reset")
