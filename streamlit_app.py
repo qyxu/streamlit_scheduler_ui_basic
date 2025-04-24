@@ -4,7 +4,7 @@ import requests
 import pandas as pd
 import matplotlib.pyplot as plt
 
-API_BASE = "https://your-api.onrender.com"  # Replace with your backend URL
+API_BASE = "https://render-scheduler-api.onrender.com"  # Replace with your backend URL
 
 st.title("📋 Unified Job Shop Scheduler with Strategy Comparison")
 
