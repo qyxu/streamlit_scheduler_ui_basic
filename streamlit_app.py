@@ -26,11 +26,12 @@ if st.sidebar.button("Add Job", key="add_job_btn"):
         if r.status_code == 200:
             st.sidebar.success("✅ Job submitted.")
         else:
+            # Try to get JSON error message
             try:
-                error_detail = r.json().get("detail", r.text)
+                error_msg = r.json().get("detail", "")
             except Exception:
-                error_detail = r.text
-            st.sidebar.error(f"❌ Failed: {error_detail}")
+                error_msg = r.text or "Unknown error"
+            st.sidebar.error(f"❌ Failed: {error_msg}")
     except Exception as e:
         st.sidebar.error(f"❌ API Error: {e}")
 
