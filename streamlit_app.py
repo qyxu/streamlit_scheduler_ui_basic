@@ -66,7 +66,7 @@ if st.button("🧹 Clear All Data"):
     except Exception as e:
         st.error(f"❌ API Error: {e}")
 
-if st.sidebar.button("Add Job"):
+if st.sidebar.button("Add Job", key="add_job_button"):
     payload = {
         "job_id": job_id,
         "duration": duration,
