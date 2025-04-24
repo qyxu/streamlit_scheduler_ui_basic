@@ -80,7 +80,10 @@ with col1:
     st.dataframe(pd.DataFrame(st.session_state["schedule_v1"]))
 
     # Add explanatory text clearly under the V1 button
-    st.markdown("### 🚩 Scheduler V1 uses No-overlap per machine logic and optimizes for the shortest end time.")
+    st.markdown(
+    "<span style='font-size:14px; color:gray;'>🚩 Scheduler V1 uses No-overlap per machine logic and optimizes for the shortest end time.</span>",
+    unsafe_allow_html=True
+    )
 
     st.markdown("---")
 
@@ -101,8 +104,10 @@ with col2:
     st.dataframe(pd.DataFrame(st.session_state["schedule_v2"]))
 
     # Add explanatory text clearly under the V1 button
-    st.markdown("### 🚩 Scheduler V2 uses No-overlap per machine logic and optimizes for minimum completion time.")
-
+    st.markdown(
+    "<span style='font-size:14px; color:gray;'>🚩 cheduler V2 uses No-overlap per machine logic and optimizes for minimum completion time.</span>",
+    unsafe_allow_html=True
+    )
     st.markdown("---")
 
 # Comparison chart if both exist
