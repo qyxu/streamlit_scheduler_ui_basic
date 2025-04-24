@@ -6,15 +6,20 @@ from PIL import Image
 import streamlit_authenticator as stauth
 
 # --- Authentication Configuration ---
+import streamlit as st
+import streamlit_authenticator as stauth
+
+# Define your credentials dictionary
 credentials = {
     'usernames': {
         'scheduler_user': {
             'name': 'Scheduler Admin',
-            'password': '<your_hashed_password_here>'  # Replace with hashed password
+            'password': '$2b$12$8L7OvR.e2Et8hmnXJ5BSsu9NJh9ixgyWxGCCiVyi8TL2fqwMh0.ce'  # Replace with your actual hashed password
         }
     }
 }
 
+# Initialize the authenticator
 authenticator = stauth.Authenticate(
     credentials,
     cookie_name='scheduler_cookie',
@@ -22,13 +27,14 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=30
 )
 
-# Updated login method signature (no returned values now!)
-authenticator.login('Login', location='main')
+# Render the login widget
+authenticator.login(location='main')
 
-if st.session_state["authentication_status"]:
-    authenticator.logout('Logout', location='sidebar')
-    username = st.session_state["username"]
-    st.sidebar.write(f'Welcome *{credentials["usernames"][username]["name"]}*')
+# Access authentication status and username from session state
+if st.session_state.get("authentication_status"):
+    authenticator.logout(location='sidebar')
+    st.sidebar.write(f'Welcome *{credentials["usernames"][st.session_state["username"]]["name"]}*')
+    st.title("Your App Content Here")
 
     # --- Original app code below (unchanged) ---
     API_BASE = "https://render-scheduler-api.onrender.com"
