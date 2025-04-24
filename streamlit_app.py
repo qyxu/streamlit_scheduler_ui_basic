@@ -12,7 +12,7 @@ import streamlit_authenticator as stauth
 # Define your credentials dictionary
 credentials = {
     'usernames': {
-        'scheduler_user': {
+        'accumet': {
             'name': 'Scheduler Admin',
             'password': '$2b$12$8L7OvR.e2Et8hmnXJ5BSsu9NJh9ixgyWxGCCiVyi8TL2fqwMh0.ce'  # Replace with your actual hashed password
         }
