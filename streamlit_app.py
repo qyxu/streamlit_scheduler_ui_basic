@@ -33,7 +33,6 @@ authenticator.login(location='main')
 # Access authentication status and username from session state
 if st.session_state.get("authentication_status"):
     authenticator.logout(location='sidebar')
-    st.sidebar.write(f'Welcome *{credentials["usernames"][st.session_state["username"]]["name"]}*')
 
     # --- Original app code below (unchanged) ---
     API_BASE = "https://render-scheduler-api.onrender.com"
