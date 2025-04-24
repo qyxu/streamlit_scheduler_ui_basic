@@ -39,7 +39,7 @@ with st.sidebar:
             st.error(f"❌ API Error: {e}")
 
 # Title with clipboard emoji and line
-st.title("📋 Unified Job Shop Scheduler")
+st.title("📋 Job Scheduler Demo")
 st.markdown("---")
 
 # Session state initialization
