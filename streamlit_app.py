@@ -7,15 +7,39 @@ from PIL import Image
 
 API_BASE = "https://render-scheduler-api.onrender.com"  # Replace with your backend URL
 
-# Header with logo
-# Logo and Title
-logo = Image.open("logo.png")
-col1, col2 = st.columns([1, 6])
-with col1:
-    st.image(logo, width=100)
-with col2:
-    st.markdown("## Job Scheduler Demo")
+# Sidebar Logo and Job Submission Form
+with st.sidebar:
+    logo = Image.open("logo.png")
+    st.image(logo, width=140)
+    st.markdown("### Submit New Job")
+    job_id = st.text_input("Job ID", key="job_id_input")
+    duration = st.number_input("Duration", min_value=1, step=1, key="duration_input")
+    due_date = st.number_input("Due Date", min_value=1, step=1, key="due_input")
+    machine = st.text_input("Machine", key="machine_input")
+    skill = st.text_input("Skill", key="skill_input")
+    if st.button("Add Job", key="add_job_btn"):
+        payload = {
+            "job_id": job_id,
+            "duration": duration,
+            "due_date": due_date,
+            "machine_required": machine,
+            "skill_required": skill
+        }
+        try:
+            r = requests.post(f"{API_BASE}/jobs", json=payload)
+            if r.status_code == 200:
+                st.success("✅ Job submitted.")
+            else:
+                try:
+                    error_detail = r.json().get("detail", r.text)
+                except Exception:
+                    error_detail = r.text
+                st.error(f"❌ Failed: {error_detail}")
+        except Exception as e:
+            st.error(f"❌ API Error: {e}")
 
+# Title with clipboard emoji and line
+st.title("📋 Unified Job Shop Scheduler")
 st.markdown("---")
 
 # Initialize session state
