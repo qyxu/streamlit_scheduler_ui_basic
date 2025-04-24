@@ -3,7 +3,7 @@ import streamlit as st
 import requests
 import pandas as pd
 
-API_BASE = "https://render-scheduler-api.onrender.com"
+API_BASE = "http://localhost:8000"
 
 st.title("📋 Job Shop Scheduler")
 
@@ -44,3 +44,14 @@ try:
     st.dataframe(pd.DataFrame(sched))
 except:
     st.warning("Could not fetch schedule data. Is the API running?")
+
+
+if st.button("⚙️ Run Scheduler"):
+    try:
+        r = requests.post(f"{API_BASE}/run-scheduler")
+        if r.status_code == 200:
+            st.success(f"✅ Scheduler ran successfully. Jobs scheduled: {r.json().get('jobs_scheduled')}")
+        else:
+            st.error(f"❌ Scheduler failed: {r.text}")
+    except Exception as e:
+        st.error(f"❌ Scheduler API error: {e}")
