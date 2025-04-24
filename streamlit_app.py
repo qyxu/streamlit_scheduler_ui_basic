@@ -34,7 +34,6 @@ authenticator.login(location='main')
 if st.session_state.get("authentication_status"):
     authenticator.logout(location='sidebar')
     st.sidebar.write(f'Welcome *{credentials["usernames"][st.session_state["username"]]["name"]}*')
-    st.title("Your App Content Here")
 
     # --- Original app code below (unchanged) ---
     API_BASE = "https://render-scheduler-api.onrender.com"
