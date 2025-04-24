@@ -6,15 +6,27 @@ import matplotlib.pyplot as plt
 
 API_BASE = "https://render-scheduler-api.onrender.com"  # Replace with your backend URL
 
-st.title("📋 Unified Job Shop Scheduler with Strategy Comparison")
+st.title("📋 Unified Job Shop Scheduler")
 
-# Init session state
+# Session state initialization
 if "schedule_v1" not in st.session_state:
     st.session_state["schedule_v1"] = []
 if "schedule_v2" not in st.session_state:
     st.session_state["schedule_v2"] = []
+if "v1_status" not in st.session_state:
+    st.session_state["v1_status"] = ""
+if "v2_status" not in st.session_state:
+    st.session_state["v2_status"] = ""
 
-# Job submission
+# Show current jobs at top
+st.subheader("📊 Current Jobs")
+try:
+    jobs = requests.get(f"{API_BASE}/jobs").json()
+    st.dataframe(pd.DataFrame(jobs))
+except:
+    st.warning("Could not load job data.")
+
+# Job submission form
 st.sidebar.header("Submit New Job")
 job_id = st.sidebar.text_input("Job ID", key="job_id_input")
 duration = st.sidebar.number_input("Duration", min_value=1, step=1, key="duration_input")
@@ -43,7 +55,7 @@ if st.sidebar.button("Add Job", key="add_job_btn"):
     except Exception as e:
         st.sidebar.error(f"❌ API Error: {e}")
 
-# Run each scheduler and store result in session state
+# Schedule generation and feedback
 col1, col2 = st.columns(2)
 
 with col1:
@@ -53,11 +65,14 @@ with col1:
             r = requests.post(f"{API_BASE}/run-scheduler-v1")
             if r.status_code == 200:
                 st.session_state["schedule_v1"] = r.json()
-                st.success("✅ Schedule V1 generated.")
+                st.session_state["v1_status"] = "✅ Schedule V1 generated."
             else:
-                st.error(f"❌ V1 failed: {r.text}")
+                st.session_state["v1_status"] = f"❌ V1 failed: {r.text}"
         except Exception as e:
-            st.error(f"❌ Error: {e}")
+            st.session_state["v1_status"] = f"❌ Error: {e}"
+
+    if st.session_state["v1_status"]:
+        st.info(st.session_state["v1_status"])
     st.dataframe(pd.DataFrame(st.session_state["schedule_v1"]))
 
 with col2:
@@ -67,14 +82,17 @@ with col2:
             r = requests.post(f"{API_BASE}/run-scheduler-v2")
             if r.status_code == 200:
                 st.session_state["schedule_v2"] = r.json()
-                st.success("✅ Schedule V2 generated.")
+                st.session_state["v2_status"] = "✅ Schedule V2 generated."
             else:
-                st.error(f"❌ V2 failed: {r.text}")
+                st.session_state["v2_status"] = f"❌ V2 failed: {r.text}"
         except Exception as e:
-            st.error(f"❌ Error: {e}")
+            st.session_state["v2_status"] = f"❌ Error: {e}"
+
+    if st.session_state["v2_status"]:
+        st.info(st.session_state["v2_status"])
     st.dataframe(pd.DataFrame(st.session_state["schedule_v2"]))
 
-# Comparison Gantt charts
+# Side-by-side comparison (if both exist)
 if st.session_state["schedule_v1"] and st.session_state["schedule_v2"]:
     df1 = pd.DataFrame(st.session_state["schedule_v1"])
     df2 = pd.DataFrame(st.session_state["schedule_v2"])
@@ -122,15 +140,7 @@ if st.session_state["schedule_v1"] and st.session_state["schedule_v2"]:
     }).reset_index()
     st.dataframe(summary)
 
-# Show current jobs
-st.subheader("📊 Current Jobs")
-try:
-    jobs = requests.get(f"{API_BASE}/jobs").json()
-    st.dataframe(pd.DataFrame(jobs))
-except:
-    st.warning("Could not load job data.")
-
-# Clear all
+# Clear all jobs and schedules
 if st.button("🧹 Clear All Jobs + Schedule", key="clear_btn"):
     try:
         r = requests.delete(f"{API_BASE}/reset")
@@ -138,6 +148,8 @@ if st.button("🧹 Clear All Jobs + Schedule", key="clear_btn"):
             st.success("✅ Cleared all job and schedule data.")
             st.session_state["schedule_v1"] = []
             st.session_state["schedule_v2"] = []
+            st.session_state["v1_status"] = ""
+            st.session_state["v2_status"] = ""
         else:
             st.error(f"❌ Reset failed: {r.text}")
     except Exception as e:
