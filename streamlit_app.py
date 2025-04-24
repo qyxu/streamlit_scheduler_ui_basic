@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from PIL import Image
 
-API_BASE = "https://render-scheduler-api.onrender.com"  # Replace with your backend URL
+API_BASE = "hhttps://render-scheduler-api.onrender.com"  # Replace with your backend URL
 
 # Sidebar Logo and Job Submission Form
 with st.sidebar:
@@ -42,7 +42,7 @@ with st.sidebar:
 st.title("📋 Unified Job Shop Scheduler")
 st.markdown("---")
 
-# Initialize session state
+# Session state initialization
 if "schedule_v1" not in st.session_state:
     st.session_state["schedule_v1"] = []
 if "schedule_v2" not in st.session_state:
@@ -52,7 +52,7 @@ if "v1_status" not in st.session_state:
 if "v2_status" not in st.session_state:
     st.session_state["v2_status"] = ""
 
-# Show current jobs at the top
+# Current Jobs
 st.subheader("📊 Current Jobs")
 try:
     jobs = requests.get(f"{API_BASE}/jobs").json()
@@ -60,36 +60,7 @@ try:
 except:
     st.warning("Could not load job data.")
 
-# Job submission form
-st.sidebar.header("Submit New Job")
-job_id = st.sidebar.text_input("Job ID", key="job_id_input")
-duration = st.sidebar.number_input("Duration", min_value=1, step=1, key="duration_input")
-due_date = st.sidebar.number_input("Due Date", min_value=1, step=1, key="due_input")
-machine = st.sidebar.text_input("Machine", key="machine_input")
-skill = st.sidebar.text_input("Skill", key="skill_input")
-
-if st.sidebar.button("Add Job", key="add_job_btn"):
-    payload = {
-        "job_id": job_id,
-        "duration": duration,
-        "due_date": due_date,
-        "machine_required": machine,
-        "skill_required": skill
-    }
-    try:
-        r = requests.post(f"{API_BASE}/jobs", json=payload)
-        if r.status_code == 200:
-            st.sidebar.success("✅ Job submitted.")
-        else:
-            try:
-                error_detail = r.json().get("detail", r.text)
-            except Exception:
-                error_detail = r.text
-            st.sidebar.error(f"❌ Failed: {error_detail}")
-    except Exception as e:
-        st.sidebar.error(f"❌ API Error: {e}")
-
-# Generate and display schedule V1 and V2
+# Schedule buttons and display
 col1, col2 = st.columns(2)
 
 with col1:
@@ -124,7 +95,7 @@ with col2:
         st.info(st.session_state["v2_status"])
     st.dataframe(pd.DataFrame(st.session_state["schedule_v2"]))
 
-# Gantt + metrics if both exist
+# Comparison chart if both exist
 if st.session_state["schedule_v1"] and st.session_state["schedule_v2"]:
     df1 = pd.DataFrame(st.session_state["schedule_v1"])
     df2 = pd.DataFrame(st.session_state["schedule_v2"])
@@ -171,7 +142,7 @@ if st.session_state["schedule_v1"] and st.session_state["schedule_v2"]:
     }).reset_index()
     st.dataframe(summary)
 
-# Clear all
+# Clear All Button
 if st.button("🧹 Clear All Jobs + Schedule", key="clear_btn"):
     try:
         r = requests.delete(f"{API_BASE}/reset")
