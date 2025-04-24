@@ -128,21 +128,19 @@ if st.session_state.get("authentication_status"):
         try:
             r = requests.delete(f"{API_BASE}/reset")
             if r.status_code == 200:
-                # Reset session state immediately
+                # Clear session state directly
                 st.session_state["schedule_v1"] = []
                 st.session_state["schedule_v2"] = []
                 st.session_state["v1_status"] = ""
                 st.session_state["v2_status"] = ""
-                
+    
                 st.success("✅ Cleared all job and schedule data.")
-                
-                # Rerun the app to refresh data immediately
-                st.experimental_rerun()
+    
+                # No rerun needed: inform users to refresh manually if desired
             else:
                 st.error(f"❌ Reset failed: {r.text}")
         except Exception as e:
             st.error(f"❌ API Error: {e}")
-
 
 
 elif st.session_state["authentication_status"] is False:
