@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from PIL import Image
 
-API_BASE = "hhttps://render-scheduler-api.onrender.com"  # Replace with your backend URL
+API_BASE = "https://render-scheduler-api.onrender.com"  # Replace with your backend URL
 
 # Sidebar Logo and Job Submission Form
 with st.sidebar:
