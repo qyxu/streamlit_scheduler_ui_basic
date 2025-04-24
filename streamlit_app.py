@@ -66,11 +66,24 @@ if st.button("🧹 Clear All Data"):
     except Exception as e:
         st.error(f"❌ API Error: {e}")
 
-if r.status_code == 200:
-    st.sidebar.success("✅ Job submitted.")
-else:
+if st.sidebar.button("Add Job"):
+    payload = {
+        "job_id": job_id,
+        "duration": duration,
+        "due_date": due_date,
+        "machine_required": machine,
+        "skill_required": skill
+    }
     try:
-        error_detail = r.json().get("detail", r.text)
-        st.sidebar.error(f"❌ Failed: {error_detail}")
-    except Exception:
-        st.sidebar.error(f"❌ Failed: {r.text}")
+        r = requests.post(f"{API_BASE}/jobs", json=payload)
+        if r.status_code == 200:
+            st.sidebar.success("✅ Job submitted.")
+        else:
+            # Try to extract a structured error message
+            try:
+                error_detail = r.json().get("detail", r.text)
+            except Exception:
+                error_detail = r.text
+            st.sidebar.error(f"❌ Failed: {error_detail}")
+    except Exception as e:
+        st.sidebar.error(f"❌ API Error: {e}")
