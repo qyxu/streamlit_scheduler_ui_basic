@@ -8,12 +8,15 @@ from PIL import Image
 API_BASE = "https://render-scheduler-api.onrender.com"  # Replace with your backend URL
 
 # Header with logo
+# Logo and Title
 logo = Image.open("logo.png")
-col_logo, col_title = st.columns([1, 5])
-with col_logo:
-    st.image(logo, width=90)
-with col_title:
-    st.title("📋 Unified Job Shop Scheduler")
+col1, col2 = st.columns([1, 6])
+with col1:
+    st.image(logo, width=100)
+with col2:
+    st.markdown("## Unified Job Shop Scheduler")
+
+st.markdown("---")
 
 # Initialize session state
 if "schedule_v1" not in st.session_state:
