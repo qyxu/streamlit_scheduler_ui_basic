@@ -1,11 +1,14 @@
+
 import streamlit as st
 import requests
 import pandas as pd
+import matplotlib.pyplot as plt
 
-API_BASE = "https://render-scheduler-api.onrender.com"  # Replace with your actual Render backend URL
+API_BASE = "https://render-scheduler-api.onrender.com"  # Replace with your actual backend URL
 
-st.title("📋 Job Shop Scheduler")
+st.title("📋 Unified Job Shop Scheduler")
 
+# Job submission
 st.sidebar.header("Submit New Job")
 job_id = st.sidebar.text_input("Job ID", key="job_id_input")
 duration = st.sidebar.number_input("Duration", min_value=1, step=1, key="duration_input")
@@ -26,49 +29,85 @@ if st.sidebar.button("Add Job", key="add_job_btn"):
         if r.status_code == 200:
             st.sidebar.success("✅ Job submitted.")
         else:
-            # Try to get JSON error message
-            try:
-                error_msg = r.json().get("detail", "")
-            except Exception:
-                error_msg = r.text or "Unknown error"
-            st.sidebar.error(f"❌ Failed: {error_msg}")
-    except Exception as e:
-        st.sidebar.error(f"❌ API Error: {e}")
-
-if st.button("⚙️ Run Scheduler", key="run_scheduler_btn"):
-    try:
-        r = requests.post(f"{API_BASE}/run-scheduler")
-        if r.status_code == 200:
-            st.success(f"✅ Scheduler ran successfully. Jobs scheduled: {r.json().get('jobs_scheduled')}")
-        else:
             try:
                 error_detail = r.json().get("detail", r.text)
             except Exception:
                 error_detail = r.text
-            st.error(f"❌ Scheduler failed: {error_detail}")
+            st.sidebar.error(f"❌ Failed: {error_detail}")
     except Exception as e:
-        st.error(f"❌ API Error: {e}")
+        st.sidebar.error(f"❌ API Error: {e}")
 
-if st.button("🧹 Clear All Data", key="clear_btn"):
+# Run and compare both strategies
+if st.button("🧪 Compare Scheduling Strategies", key="compare_btn"):
     try:
-        r = requests.delete(f"{API_BASE}/reset")
+        r = requests.post(f"{API_BASE}/compare-schedulers")
         if r.status_code == 200:
-            st.success("✅ All jobs and schedules cleared.")
-        else:
-            st.error(f"❌ Reset failed: {r.text}")
-    except Exception as e:
-        st.error(f"❌ API Error: {e}")
+            data = r.json()
+            df = pd.DataFrame(data)
+            if df.empty:
+                st.warning("No jobs available to schedule.")
+            else:
+                v1 = df[df["version"] == "v1"]
+                v2 = df[df["version"] == "v2"]
 
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.subheader("Strategy V1")
+                    fig, ax = plt.subplots(figsize=(8, 4))
+                    ax.set_title("Gantt Chart: V1")
+                    for _, row in v1.iterrows():
+                        ax.barh(row["job_id"], row["end"] - row["start"], left=row["start"])
+                        ax.text(row["start"], row["job_id"], f'{row["start"]}-{row["end"]}', va='center', ha='left')
+                    ax.set_xlabel("Time")
+                    ax.set_ylabel("Job ID")
+                    st.pyplot(fig)
+
+                with col2:
+                    st.subheader("Strategy V2")
+                    fig, ax = plt.subplots(figsize=(8, 4))
+                    ax.set_title("Gantt Chart: V2")
+                    for _, row in v2.iterrows():
+                        ax.barh(row["job_id"], row["end"] - row["start"], left=row["start"])
+                        ax.text(row["start"], row["job_id"], f'{row["start"]}-{row["end"]}', va='center', ha='left')
+                    ax.set_xlabel("Time")
+                    ax.set_ylabel("Job ID")
+                    st.pyplot(fig)
+
+                st.subheader("📊 Summary Metrics")
+                st.dataframe(df.groupby("version").agg(
+                    job_count=("job_id", "count"),
+                    avg_start=("start", "mean"),
+                    avg_end=("end", "mean"),
+                    avg_duration=(lambda x: (x["end"] - x["start"]).mean())
+                ).reset_index())
+
+        else:
+            st.error(f"❌ Compare failed: {r.text}")
+    except Exception as e:
+        st.error(f"❌ Error: {e}")
+
+# Show current data
 st.subheader("📊 Current Jobs")
 try:
     jobs = requests.get(f"{API_BASE}/jobs").json()
     st.dataframe(pd.DataFrame(jobs))
 except:
-    st.warning("Could not fetch job data. Is the API running?")
+    st.warning("Could not load job data.")
 
 st.subheader("📅 Current Schedule")
 try:
     sched = requests.get(f"{API_BASE}/schedule").json()
     st.dataframe(pd.DataFrame(sched))
 except:
-    st.warning("Could not fetch schedule data. Is the API running?")
+    st.warning("Could not load schedule data.")
+
+# Clear all
+if st.button("🧹 Clear All Jobs + Schedule", key="clear_btn"):
+    try:
+        r = requests.delete(f"{API_BASE}/reset")
+        if r.status_code == 200:
+            st.success("✅ Cleared all job and schedule data.")
+        else:
+            st.error(f"❌ Reset failed: {r.text}")
+    except Exception as e:
+        st.error(f"❌ API Error: {e}")
