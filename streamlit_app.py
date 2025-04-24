@@ -14,7 +14,7 @@ due_date = st.sidebar.number_input("Due Date", min_value=1, step=1)
 machine = st.sidebar.text_input("Machine")
 skill = st.sidebar.text_input("Skill")
 
-if st.sidebar.button("Add Job"):
+if st.sidebar.button("Add Job", key="add_job_button"):
     payload = {
         "job_id": job_id,
         "duration": duration,
@@ -27,8 +27,13 @@ if st.sidebar.button("Add Job"):
         if r.status_code == 200:
             st.sidebar.success("✅ Job submitted.")
         else:
-            st.sidebar.error(f"❌ Failed: {r.text}")
-    except requests.exceptions.RequestException as e:
+            # Try to extract a structured error message
+            try:
+                error_detail = r.json().get("detail", r.text)
+            except Exception:
+                error_detail = r.text
+            st.sidebar.error(f"❌ Failed: {error_detail}")
+    except Exception as e:
         st.sidebar.error(f"❌ API Error: {e}")
 
 st.subheader("📊 Current Jobs")
@@ -66,24 +71,4 @@ if st.button("🧹 Clear All Data"):
     except Exception as e:
         st.error(f"❌ API Error: {e}")
 
-if st.sidebar.button("Add Job", key="add_job_button"):
-    payload = {
-        "job_id": job_id,
-        "duration": duration,
-        "due_date": due_date,
-        "machine_required": machine,
-        "skill_required": skill
-    }
-    try:
-        r = requests.post(f"{API_BASE}/jobs", json=payload)
-        if r.status_code == 200:
-            st.sidebar.success("✅ Job submitted.")
-        else:
-            # Try to extract a structured error message
-            try:
-                error_detail = r.json().get("detail", r.text)
-            except Exception:
-                error_detail = r.text
-            st.sidebar.error(f"❌ Failed: {error_detail}")
-    except Exception as e:
-        st.sidebar.error(f"❌ API Error: {e}")
+
