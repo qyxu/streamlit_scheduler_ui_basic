@@ -1,3 +1,11 @@
+import streamlit as st
+import requests
+import pandas as pd
+
+API_BASE = "https://render-scheduler-api.onrender.com"  # Replace with your actual Render backend URL
+
+st.title("📋 Job Shop Scheduler")
+
 st.sidebar.header("Submit New Job")
 job_id = st.sidebar.text_input("Job ID", key="job_id_input")
 duration = st.sidebar.number_input("Duration", min_value=1, step=1, key="duration_input")
