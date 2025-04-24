@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 API_BASE = "https://render-scheduler-api.onrender.com"  # Replace with your backend URL
 
-st.title("📋 Unified Job Shop Scheduler")
+st.title("📋 Manufacturing Job Scheduler Demo")
 
 # Session state initialization
 if "schedule_v1" not in st.session_state:
