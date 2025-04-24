@@ -102,6 +102,53 @@ if st.session_state.get("authentication_status"):
         st.dataframe(pd.DataFrame(st.session_state["schedule_v2"]))
         st.markdown("<small>🚩 Scheduler V2: No-overlap per machine, min completion time.</small>", unsafe_allow_html=True)
 
+    # Comparison chart if both exist
+    if st.session_state["schedule_v1"] and st.session_state["schedule_v2"]:
+        df1 = pd.DataFrame(st.session_state["schedule_v1"])
+        df2 = pd.DataFrame(st.session_state["schedule_v2"])
+        st.subheader("📈 Strategy Gantt Chart Comparison")
+    
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("**Strategy V1**")
+            fig, ax = plt.subplots(figsize=(8, 4))
+            for _, row in df1.iterrows():
+                ax.barh(row["job_id"], row["end"] - row["start"], left=row["start"])
+                ax.text(row["start"], row["job_id"], f'{row["start"]}-{row["end"]}', va='center', ha='left')
+            ax.set_xlabel("Time")
+            ax.set_ylabel("Job ID")
+            ax.set_title("V1 Gantt Chart")
+            st.pyplot(fig)
+    
+        with col2:
+            st.markdown("**Strategy V2**")
+            fig, ax = plt.subplots(figsize=(8, 4))
+            for _, row in df2.iterrows():
+                ax.barh(row["job_id"], row["end"] - row["start"], left=row["start"])
+                ax.text(row["start"], row["job_id"], f'{row["start"]}-{row["end"]}', va='center', ha='left')
+            ax.set_xlabel("Time")
+            ax.set_ylabel("Job ID")
+            ax.set_title("V2 Gantt Chart")
+            st.pyplot(fig)
+    
+        st.subheader("📊 Strategy Metrics")
+        df1["version"] = "v1"
+        df2["version"] = "v2"
+        all_df = pd.concat([df1, df2])
+        all_df["duration"] = all_df["end"] - all_df["start"]
+        summary = all_df.groupby("version").agg({
+            "job_id": "count",
+            "start": "mean",
+            "end": "mean",
+            "duration": "mean"
+        }).rename(columns={
+            "job_id": "Job Count",
+            "start": "Avg Start",
+            "end": "Avg End",
+            "duration": "Avg Duration"
+        }).reset_index()
+        st.dataframe(summary)
+
     # Clear All Data
     if st.button("🧹 Clear All Jobs + Schedule"):
         r = requests.delete(f"{API_BASE}/reset")
