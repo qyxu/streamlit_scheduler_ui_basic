@@ -55,3 +55,13 @@ if st.button("⚙️ Run Scheduler"):
             st.error(f"❌ Scheduler failed: {r.text}")
     except Exception as e:
         st.error(f"❌ Scheduler API error: {e}")
+
+if st.button("🧹 Clear All Data"):
+    try:
+        r = requests.delete(f"{API_BASE}/reset")
+        if r.status_code == 200:
+            st.success("✅ All jobs and schedules deleted.")
+        else:
+            st.error(f"❌ Failed to reset: {r.text}")
+    except Exception as e:
+        st.error(f"❌ API Error: {e}")
