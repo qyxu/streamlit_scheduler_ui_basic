@@ -65,3 +65,12 @@ if st.button("🧹 Clear All Data"):
             st.error(f"❌ Failed to reset: {r.text}")
     except Exception as e:
         st.error(f"❌ API Error: {e}")
+
+if r.status_code == 200:
+    st.sidebar.success("✅ Job submitted.")
+else:
+    try:
+        error_detail = r.json().get("detail", r.text)
+        st.sidebar.error(f"❌ Failed: {error_detail}")
+    except Exception:
+        st.sidebar.error(f"❌ Failed: {r.text}")
