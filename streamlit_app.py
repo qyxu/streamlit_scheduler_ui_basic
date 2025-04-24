@@ -74,13 +74,19 @@ if st.button("🧪 Compare Scheduling Strategies", key="compare_btn"):
                     st.pyplot(fig)
 
                 st.subheader("📊 Summary Metrics")
-                st.dataframe(df.groupby("version").agg(
-                    job_count=("job_id", "count"),
-                    avg_start=("start", "mean"),
-                    avg_end=("end", "mean"),
-                    avg_duration=(lambda x: (x["end"] - x["start"]).mean())
-                ).reset_index())
-
+                df["duration"] = df["end"] - df["start"]
+                summary = df.groupby("version").agg({
+                    "job_id": "count",
+                    "start": "mean",
+                    "end": "mean",
+                    "duration": "mean"
+                }).rename(columns={
+                    "job_id": "Job Count",
+                    "start": "Avg Start",
+                    "end": "Avg End",
+                    "duration": "Avg Duration"
+                }).reset_index()
+                st.dataframe(summary)
         else:
             st.error(f"❌ Compare failed: {r.text}")
     except Exception as e:
